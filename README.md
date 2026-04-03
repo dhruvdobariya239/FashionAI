@@ -342,7 +342,7 @@ PORT=5000
 NODE_ENV=development
 
 # Database
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/fashion_store?retryWrites=true&w=majority
+MONGODB_URI=your_monogodb_uri
 
 # JWT
 JWT_SECRET=your_super_secret_jwt_key_here
