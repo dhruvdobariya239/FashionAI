@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: 26 26 26;
+    --fg: 255 255 255;
+    --muted: 168 168 168;
+    --card: 45 45 45;
+    --border: 212 165 116;
+    --brand: 212 165 116;
+    --brand-2: 197 152 104;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-gradient-to-b from-[#1a1a1a] via-[#2d2d2d] to-[#1a1a1a] text-white antialiased;
+  }
+}
+
+@layer utilities {
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgba(212, 165, 116, 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(212, 165, 116, 0.1) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+}
