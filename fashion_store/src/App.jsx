@@ -20,6 +20,7 @@ import TryOnGallery from './pages/profile/TryOnGallery';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Orders from './pages/Orders';
+import Success from './pages/Success';
 
 // Toast config
 const TOAST_OPTIONS = {
@@ -60,6 +61,7 @@ const AppShell = () => (
       <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
       <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/success" element={<Success />} />
     </Routes>
     <Footer />
     <Toaster position="top-right" toastOptions={TOAST_OPTIONS} />

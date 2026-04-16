@@ -17,7 +17,10 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
-    const handleLogout = () => { logout(); navigate('/'); };
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
 
     const navLinks = [
         { label: 'Men', to: '/men' },
@@ -25,24 +28,38 @@ const Navbar = () => {
         { label: 'Children', to: '/children' },
     ];
 
+    const desktopLinkClass = ({ isActive }) =>
+        `text-[0.75rem] tracking-[0.15em] uppercase font-medium transition-all duration-300 pb-0.5 ${
+            isActive
+                ? 'text-[#D4A574] border-b-2 border-[#D4A574]'
+                : 'text-[#D4D4D4] hover:text-white'
+        }`;
+
+    const mobileLinkClass = ({ isActive }) =>
+        `block text-[0.75rem] tracking-[0.15em] uppercase font-medium py-2 transition-colors duration-300 ${
+            isActive
+                ? 'text-[#D4A574]'
+                : 'text-[#D4D4D4] hover:text-white'
+        }`;
+
     return (
         <nav
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-                ? 'bg-[#1a1a1a]/95 backdrop-blur-md border-b border-[#D4A574]/30 shadow-lg'
-                : 'bg-[#1a1a1a] border-b border-[#D4A574]/20'
-                }`}
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+                scrolled
+                    ? 'bg-[#1a1a1a]/95 backdrop-blur-md border-b border-[#D4A574]/30 shadow-lg'
+                    : 'bg-[#1a1a1a] border-b border-[#D4A574]/20'
+            }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
-                    
-                    
+
+                    {/* Logo */}
                     <Link to="/" className="flex-shrink-0 group hover:opacity-80 transition-opacity">
-                        <span
-                            style={{ fontFamily: "'Playfair Display', serif" }}
-                            className="text-2xl tracking-[0.3em] uppercase font-semibold text-[#D4A574] group-hover:text-white transition-colors duration-300"
-                        >
-                            <img src="../public/1000273660.png" alt="Fashion Store Logo" className="h-16 w-auto opacity-100 group-hover:opacity-100 transition-opacity" />
-                        </span>
+                        <img
+                            src="/1000273660.png"
+                            alt="Fashion Store Logo"
+                            className="h-16 w-auto opacity-100 group-hover:opacity-100 transition-opacity"
+                        />
                     </Link>
 
                     {/* Desktop Nav Links */}
@@ -51,12 +68,7 @@ const Navbar = () => {
                             <NavLink
                                 key={link.to}
                                 to={link.to}
-                                className={({ isActive }) =>
-                                    `text-[0.75rem] tracking-[0.15em] uppercase font-medium transition-all pb-0.5 ${isActive
-                                        ? 'text-[#D4A574] border-b-2 border-[#D4A574]'
-                                        : 'text-[#D4D4D4] hover:text-white'
-                                    }`
-                                }
+                                className={desktopLinkClass}
                             >
                                 {link.label}
                             </NavLink>
@@ -65,10 +77,17 @@ const Navbar = () => {
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-3">
+
                         {/* Cart */}
-                        <Link
+                        <NavLink
                             to="/cart"
-                            className="relative p-2 text-[#D4D4D4] hover:text-[#D4A574] transition-colors duration-300"
+                            className={({ isActive }) =>
+                                `relative p-2 transition-colors duration-300 ${
+                                    isActive
+                                        ? 'text-[#D4A574]'
+                                        : 'text-[#D4D4D4] hover:text-[#D4A574]'
+                                }`
+                            }
                         >
                             <ShoppingBagIcon className="h-5 w-5" />
                             {itemCount > 0 && (
@@ -76,24 +95,32 @@ const Navbar = () => {
                                     {itemCount > 9 ? '9+' : itemCount}
                                 </span>
                             )}
-                        </Link>
+                        </NavLink>
 
                         {/* Auth — Desktop */}
                         {isAuthenticated ? (
                             <div className="hidden md:flex items-center gap-4">
-                                <Link
+                                <NavLink
                                     to="/profile"
-                                    className="flex items-center gap-1.5 text-[0.75rem] tracking-[0.1em] uppercase text-[#D4D4D4] hover:text-[#D4A574] transition-colors duration-300"
+                                    className={({ isActive }) =>
+                                        `flex items-center gap-1.5 text-[0.75rem] tracking-[0.1em] uppercase transition-all duration-300 pb-0.5 ${
+                                            isActive
+                                                ? 'text-[#D4A574] border-b-2 border-[#D4A574]'
+                                                : 'text-[#D4D4D4] hover:text-[#D4A574]'
+                                        }`
+                                    }
                                 >
                                     <UserIcon className="h-4 w-4" />
                                     {user?.name?.split(' ')[0]}
-                                </Link>
-                                <Link
+                                </NavLink>
+
+                                <NavLink
                                     to="/orders"
-                                    className="text-[0.75rem] tracking-[0.1em] uppercase text-[#D4D4D4] hover:text-[#D4A574] transition-colors duration-300"
+                                    className={desktopLinkClass}
                                 >
                                     Orders
-                                </Link>
+                                </NavLink>
+
                                 <button
                                     onClick={handleLogout}
                                     className="text-[0.75rem] tracking-[0.1em] uppercase text-[#D4D4D4] hover:text-red-400 transition-colors duration-300"
@@ -103,16 +130,19 @@ const Navbar = () => {
                             </div>
                         ) : (
                             <div className="hidden md:flex items-center gap-4">
-                                <Link
+                                <NavLink
                                     to="/login"
-                                    className="text-[0.75rem] tracking-[0.1em] uppercase text-[#D4D4D4] hover:text-[#D4A574] transition-colors duration-300"
+                                    className={desktopLinkClass}
                                 >
                                     Login
-                                </Link>
-                                <Link to="/register" 
-                                  className="text-[0.75rem] tracking-[0.1em] uppercase text-[#D4D4D4] hover:text-[#D4A574] transition-colors duration-300">
+                                </NavLink>
+
+                                <NavLink
+                                    to="/register"
+                                    className={desktopLinkClass}
+                                >
                                     Register
-                                </Link>
+                                </NavLink>
                             </div>
                         )}
 
@@ -121,7 +151,11 @@ const Navbar = () => {
                             className="md:hidden p-2 text-[#D4D4D4] hover:text-[#D4A574] transition-colors duration-300"
                             onClick={() => setMobileOpen(!mobileOpen)}
                         >
-                            {mobileOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
+                            {mobileOpen ? (
+                                <XMarkIcon className="h-5 w-5" />
+                            ) : (
+                                <Bars3Icon className="h-5 w-5" />
+                            )}
                         </button>
                     </div>
                 </div>
@@ -135,25 +169,74 @@ const Navbar = () => {
                             key={link.to}
                             to={link.to}
                             onClick={() => setMobileOpen(false)}
-                            className={({ isActive }) =>
-                                `block text-[0.75rem] tracking-[0.15em] uppercase font-medium py-2 transition-colors ${isActive ? 'text-[#D4A574]' : 'text-[#D4D4D4] hover:text-white'
-                                }`
-                            }
+                            className={mobileLinkClass}
                         >
                             {link.label}
                         </NavLink>
                     ))}
+
                     <hr className="border-[#D4A574]/20" />
+
+                    {/* Mobile Cart */}
+                    <NavLink
+                        to="/cart"
+                        onClick={() => setMobileOpen(false)}
+                        className={mobileLinkClass}
+                    >
+                        Cart
+                    </NavLink>
+
                     {isAuthenticated ? (
                         <>
-                            <Link to="/profile" onClick={() => setMobileOpen(false)} className="block text-[0.75rem] tracking-[0.1em] uppercase text-[#D4D4D4] hover:text-[#D4A574] transition-colors py-2">Profile</Link>
-                            <Link to="/orders" onClick={() => setMobileOpen(false)} className="block text-[0.75rem] tracking-[0.1em] uppercase text-[#D4D4D4] hover:text-[#D4A574] transition-colors py-2">My Orders</Link>
-                            <button onClick={() => { handleLogout(); setMobileOpen(false); }} className="block text-[0.75rem] tracking-[0.1em] uppercase text-red-400 hover:text-red-300 transition-colors py-2">Logout</button>
+                            <NavLink
+                                to="/profile"
+                                onClick={() => setMobileOpen(false)}
+                                className={mobileLinkClass}
+                            >
+                                Profile
+                            </NavLink>
+
+                            <NavLink
+                                to="/orders"
+                                onClick={() => setMobileOpen(false)}
+                                className={mobileLinkClass}
+                            >
+                                My Orders
+                            </NavLink>
+
+                            <button
+                                onClick={() => {
+                                    handleLogout();
+                                    setMobileOpen(false);
+                                }}
+                                className="block text-[0.75rem] tracking-[0.1em] uppercase text-red-400 hover:text-red-300 transition-colors py-2"
+                            >
+                                Logout
+                            </button>
                         </>
                     ) : (
                         <>
-                            <Link to="/login" onClick={() => setMobileOpen(false)} className="block text-[0.75rem] tracking-[0.1em] uppercase text-[#D4D4D4] hover:text-white transition-colors py-2">Login</Link>
-                            <Link to="/register" onClick={() => setMobileOpen(false)} className="block text-[0.75rem] tracking-[0.1em] uppercase text-[#1a1a1a] font-semibold py-2 bg-[#D4A574] px-4 rounded-lg hover:shadow-lg transition-all text-center">Register</Link>
+                            <NavLink
+                                to="/login"
+                                onClick={() => setMobileOpen(false)}
+                                className={mobileLinkClass}
+                            >
+                                Login
+                            </NavLink>
+
+                            <NavLink
+                                to="/register"
+                                onClick={() => setMobileOpen(false)}
+                                className={({ isActive }) =>
+                                    `block text-[0.75rem] tracking-[0.1em] uppercase font-semibold py-2 px-4 rounded-lg transition-all text-center ${
+                                        isActive
+                                            ? 'bg-white text-[#1a1a1a] shadow-lg'
+                                            : 'bg-[#D4A574] text-[#1a1a1a] hover:shadow-lg'
+                                    }`
+                                }
+                            >
+                                Register
+                            </NavLink>
                         </>
                     )}
                 </div>

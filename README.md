@@ -1,4 +1,4 @@
-# FashionAI - AI-Powered Fashion E-Commerce Platform
+# Vastra - AI-Powered Fashion E-Commerce Platform
 
 A modern, full-stack fashion e-commerce application with AI-powered features including virtual try-on, smart size recommendations, and advanced admin analytics.
 
@@ -29,7 +29,7 @@ A modern, full-stack fashion e-commerce application with AI-powered features inc
 
 ## 🎯 Project Overview
 
-**FashionAI** is a cutting-edge fashion e-commerce platform that combines modern web technologies with AI-powered features. The platform offers:
+**Vastra** is a cutting-edge fashion e-commerce platform that combines modern web technologies with AI-powered features. The platform offers:
 
 - **Customer-facing store** for browsing and purchasing fashion items
 - **Virtual try-on** using AI image processing
@@ -73,6 +73,7 @@ The application is built with a **React frontend**, **Node.js/Express backend**,
 - **CORS 2.8** - Cross-origin resource sharing
 - **Dotenv 17.3** - Environment variables
 - **Google GenAI 1.42** - AI model integration
+-**Strip** - Payment Gateway
 
 ### Admin Dashboard
 - **React 19.2** - UI framework
@@ -131,6 +132,7 @@ projects/
 │   │   ├── cartController.js
 │   │   ├── profileController.js
 │   │   ├── aiController.js
+|   |   ├── paymentController.js
 │   │   ├── adminPanelController.js
 │   │   └── qrUploadController.js
 │   ├── routes/                    # API endpoints
@@ -142,6 +144,7 @@ projects/
 │   │   ├── profileRoutes.js
 │   │   ├── aiRoutes.js
 │   │   ├── adminPanelRoutes.js
+|   |   |── paymentRoutes.js   
 │   │   └── qrUploadRoutes.js
 │   ├── middleware/                # Express middleware
 │   │   ├── authMiddleware.js     # JWT verification
@@ -151,10 +154,12 @@ projects/
 │   │   ├── recommendationService.js
 │   │   └── sizeService.js
 │   ├── utils/                     # Helper utilities
-│   │   ├── seeder.js             # Sample data generation
-│   │   ├── orderSeeder.js        # Order sample data
-│   │   └── createAdmin.js        # Admin user creation
-│   ├── admin-frontend/            # Admin dashboard (React)
+│       ├── seeder.js             # Sample data generation
+│       ├── orderSeeder.js        # Order sample data
+│       └── createAdmin.js        # Admin user creation
+|
+|
+│── admin-frontend/            # Admin dashboard (React)
 │   │   ├── src/
 │   │   │   ├── ui/               # Admin UI components
 │   │   │   │   ├── pages/        # Admin pages
@@ -184,8 +189,8 @@ projects/
 │   ├── .env                       # Environment variables
 │   ├── package.json
 │   ├── server.js                  # Express server entry
-│   └── README.md                  # Backend README
-
+│   └── README.md                  # Backend README   
+|
 └── README.md                      # This file
 ```
 
@@ -266,13 +271,6 @@ projects/
 
 ## 🚀 Installation & Setup
 
-### Prerequisites
-- **Node.js** v16 or higher
-- **npm** or **yarn**
-- **MongoDB** instance (local or Atlas cloud)
-- **Cloudinary** account for image storage
-- **Google GenAI** API key (for AI features)
-- **Email service** credentials (Nodemailer)
 
 ### Step 1: Clone or Extract Project
 
@@ -320,7 +318,7 @@ npm run dev
 ### Step 4: Setup Admin Dashboard
 
 ```bash
-cd ../fashion_store_backend/admin-frontend
+cd ../admin-frontend
 
 # Install dependencies
 npm install
@@ -416,324 +414,6 @@ npm run preview
 
 ---
 
-
-### Authentication Endpoints
-
-#### Register User
-```http
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "securepassword123"
-}
-
-Response:
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "_id": "123456",
-    "name": "John Doe",
-    "email": "john@example.com",
-    "role": "user"
-  }
-}
-```
-
-#### Login User
-```http
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "john@example.com",
-  "password": "securepassword123"
-}
-
-Response: {token, user}
-```
-
-#### Get Current User
-```http
-GET /api/auth/me
-Authorization: Bearer {token}
-
-Response: {user}
-```
-
----
-
-### Product Endpoints
-
-#### Get All Products
-```http
-GET /api/products?page=1&limit=12&sort=newest&search=shirt
-
-Response:
-{
-  "products": [...],
-  "total": 70,
-  "page": 1,
-  "pages": 6
-}
-```
-
-#### Get Product by ID
-```http
-GET /api/products/:id
-
-Response: {product details}
-```
-
-#### Create Product (Admin)
-```http
-POST /api/products
-Authorization: Bearer {admin_token}
-Content-Type: multipart/form-data
-
-{
-  "name": "Blue Shirt",
-  "description": "Premium cotton shirt",
-  "price": 1999,
-  "gender": "men",
-  "subcategory": "shirts",
-  "category": "507f1f77bcf86cd799439011",
-  "images": [image_files...],
-  "sizes": [{"size": "M", "stock": 10}],
-  ...
-}
-```
-
-#### Update Product (Admin)
-```http
-PUT /api/products/:id
-Authorization: Bearer {admin_token}
-Content-Type: application/json
-
-{
-  "name": "Updated Blue Shirt",
-  "price": 2199,
-  ...
-}
-```
-
-#### Delete Product (Admin)
-```http
-DELETE /api/products/:id
-Authorization: Bearer {admin_token}
-```
-
----
-
-### Order Endpoints
-
-#### Create Order
-```http
-POST /api/orders
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "items": [
-    {
-      "product": "507f1f77bcf86cd799439011",
-      "quantity": 2,
-      "size": "M"
-    }
-  ],
-  "shippingAddress": {
-    "fullName": "John Doe",
-    "phone": "9999999999",
-    "addressLine1": "123 Main St",
-    "city": "New York",
-    "state": "NY",
-    "postalCode": "10001",
-    "country": "USA"
-  },
-  "paymentMethod": "cod"
-}
-```
-
-#### Get Orders
-```http
-GET /api/orders
-Authorization: Bearer {token}
-
-Response: [orders]
-```
-
-#### Get Order by ID
-```http
-GET /api/orders/:id
-Authorization: Bearer {token}
-
-Response: {order details}
-```
-
----
-
-### Admin Endpoints
-
-#### Get Dashboard Analytics
-```http
-GET /api/admin/analytics/revenue-orders?days=30
-Authorization: Bearer {admin_token}
-
-Response:
-{
-  "revenueData": [
-    {
-      "_id": "2024-03-20",
-      "revenue": 15000,
-      "orders": 5
-    },
-    ...
-  ]
-}
-```
-
-#### Get Best Selling Products
-```http
-GET /api/admin/analytics/best-selling?limit=5
-Authorization: Bearer {admin_token}
-
-Response:
-{
-  "bestSelling": [
-    {
-      "_id": "507f1f77bcf86cd799439011",
-      "productName": "White Sneakers",
-      "productImage": "url...",
-      "totalSold": 45,
-      "totalRevenue": 80955
-    },
-    ...
-  ]
-}
-```
-
-#### Get All Orders (Admin)
-```http
-GET /api/admin/orders?page=1&limit=15&status=delivered
-Authorization: Bearer {admin_token}
-
-Response:
-{
-  "orders": [...],
-  "total": 68,
-  "page": 1,
-  "pages": 5
-}
-```
-
-#### Update Order Status
-```http
-PATCH /api/admin/orders/:id/status
-Authorization: Bearer {admin_token}
-Content-Type: application/json
-
-{
-  "orderStatus": "shipped",
-  "paymentStatus": "paid"
-}
-```
-
-#### Send Email to Customer
-```http
-POST /api/admin/emails/order
-Authorization: Bearer {admin_token}
-Content-Type: application/json
-
-{
-  "orderId": "507f1f77bcf86cd799439011",
-  "subject": "Your Order is Shipped",
-  "message": "Your order has been shipped..."
-}
-```
-
----
-
-## 👨‍💼 Admin Dashboard
-
-### Access Admin Panel
-- **URL**: `http://localhost:5174`
-- **Login**: Use admin credentials created with `npm run create-admin`
-
-### Admin Dashboard Pages
-
-#### 1. **Dashboard** (Analytics)
-- Revenue over last 30 days (bar chart)
-- Order count visualization
-- Best-selling products (top 5)
-- Key metrics cards
-
-#### 2. **Products**
-- List all products with pagination
-- Search products by name, tags, description
-- Edit product details
-- Create new products with image upload
-- Delete products
-- Manage product visibility
-
-#### 3. **Categories**
-- Create new categories
-- Edit category details
-- Delete categories
-- Organize products by category
-
-#### 4. **Orders**
-- View all orders with filters
-- Filter by status (processing, confirmed, shipped, delivered, cancelled)
-- Filter by payment status
-- Update order status
-- Send email notifications
-- View detailed order information
-
-#### 5. **Users**
-- View all registered users
-- User registration dates and details
-
-#### 6. **Emails**
-- Send promotional emails to users
-- Send order-specific emails
-- Email templates with order details
-
-### Admin Dashboard Design
-- **Theme**: Dark mode with gold accents (#D4A574, #C59868)
-- **Components**: Custom styled cards, buttons, inputs
-- **Responsive**: Mobile-friendly interface
-- **Charts**: Powered by Recharts library
-
----
-
-## 🎨 Key Features Explained
-
-### Virtual Try-On
-The virtual try-on feature allows users to upload a photo of themselves and see how different products look on them using AI image processing.
-
-**Flow:**
-1. User navigates to product detail page
-2. Clicks "Try On This Item"
-3. Uploads a photo (or uses camera)
-4. AI processes the image
-5. Returns a photo with the product virtually worn
-
-**Technology**: Uses Google GenAI or Hugging Face models for image manipulation
-
-### Size Recommendations
-Based on user profile data and past orders, the system recommends optimal sizes for products.
-
-**Data Collected:**
-- Past order sizes and items
-- Manual measurements (optional)
-- Skin tone preference
-- User feedback
-
-**Algorithm**: Weighted averaging based on similar products purchased
-
-### Mobile Try-On Gallery
 Users can upload photos on mobile and create a gallery of virtual try-ons.
 
 **Features:**

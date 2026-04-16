@@ -70,8 +70,12 @@ const tryOn = async (req, res, next) => {
                     publicId: profile.selectedPhotoPublicId || profile.photoPublicId || '',
                 },
                 images: (images || [])
-                    .filter((x) => x?.url)
-                    .map((x) => ({ url: x.url, pose: x.pose || '' })),
+    .filter((x) => x?.url)
+    .map((x) => ({
+        url: x.url,
+        pose: x.pose || '',
+        publicId: x.publicId || '',
+    })),
             });
         } catch (e) {
             console.warn('TryOnHistory save failed:', e?.message || e);

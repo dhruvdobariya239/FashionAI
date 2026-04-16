@@ -121,16 +121,76 @@ const adminSendOrderEmail = async (req, res, next) => {
             .map((it) => `<li>${it.name} (${it.size || 'size N/A'}) x ${it.quantity} - ${formatCurrency(it.price)}</li>`)
             .join('');
         const html = `
-            <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                <h2>Hello ${order.user.name || 'Customer'},</h2>
-                <p>${message || `Your order <b>#${order._id}</b> is currently <b>${order.orderStatus}</b>.`}</p>
-                <p><b>Order Details</b></p>
-                <ul>${itemRows}</ul>
-                <p>Subtotal: ${formatCurrency(order.subtotal)}</p>
-                <p>Shipping: ${formatCurrency(order.shippingCost)}</p>
-                <p><b>Total: ${formatCurrency(order.total)}</b></p>
-                <p>Thanks for shopping with us.</p>
-            </div>
+            
+<div style="font-family: 'Segoe UI', Arial, sans-serif; background:#f4f4f4; padding:20px;">
+  <div style="max-width:600px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+
+    <!-- Header -->
+    <div style="background:#D4A574; padding:20px; text-align:center; color:#1a1a1a;">
+      <h2 style="margin:0;">Fashion Store</h2>
+      <p style="margin:0; font-size:14px;">Order Update</p>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:20px; color:#333;">
+      <h3>Hello ${order.user.name || 'Customer'},</h3>
+
+      <p style="font-size:14px;">
+        ${message || `Your order <b>#${order._id}</b> is now 
+        <span style="color:#D4A574; font-weight:bold;">${order.orderStatus}</span>.`}
+      </p>
+
+      <!-- Order Details -->
+      <h4 style="margin-top:20px;">Order Summary</h4>
+      <table width="100%" style="border-collapse:collapse; font-size:14px;">
+        <thead>
+          <tr style="background:#f9f9f9;">
+            <th align="left" style="padding:8px;">Item</th>
+            <th align="center" style="padding:8px;">Qty</th>
+            <th align="right" style="padding:8px;">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${order.items.map(item => `
+            <tr>
+              <td style="padding:8px;">${item.name}</td>
+              <td align="center">${item.quantity}</td>
+              <td align="right">₹${item.price * item.quantity}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+
+      <!-- Totals -->
+      <div style="margin-top:15px; font-size:14px;">
+        <p>Subtotal: ₹${order.subtotal}</p>
+        <p>Shipping: ₹${order.shippingCost}</p>
+        <p style="font-weight:bold; font-size:16px;">
+          Total: ₹${order.total}
+        </p>
+      </div>
+
+      <!-- CTA -->
+      <div style="text-align:center; margin:25px 0;">
+        <a href="http://localhost:5173/orders"
+           style="background:#D4A574; color:#1a1a1a; padding:10px 20px;
+                  border-radius:5px; text-decoration:none; font-weight:bold;">
+          View Order
+        </a>
+      </div>
+
+      <p style="font-size:13px; color:#777;">
+        Thank you for shopping with us ❤️
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#1a1a1a; color:#ccc; text-align:center; padding:15px; font-size:12px;">
+      © 2026 Fashion Store • All rights reserved
+    </div>
+
+  </div>
+</div>
         `;
 
         const info = await transporter.sendMail({
@@ -176,12 +236,58 @@ const adminSendPromoEmail = async (req, res, next) => {
             bcc: validUsers.map((u) => u.email).join(','),
             subject,
             html: `
-                <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-                    <h2>Fashion Store</h2>
-                    ${productHtml}
-                    <p>${String(message).replace(/\n/g, '<br/>')}</p>
-                    ${linkHtml}
-                </div>
+           
+<div style="font-family:'Segoe UI', Arial, sans-serif; background:#f4f4f4; padding:20px;">
+  <div style="max-width:600px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+
+    <!-- Header -->
+    <div style="background:#1a1a1a; padding:20px; text-align:center; color:#D4A574;">
+      <h2 style="margin:0;">Fashion Store</h2>
+      <p style="margin:0; font-size:13px;">New Arrivals & Exclusive Deals</p>
+    </div>
+
+    <!-- Banner -->
+    <div style="padding:20px; text-align:center;">
+      <h1 style="margin:0; font-size:22px; color:#333;">
+        🔥 Special Offer Just for You!
+      </h1>
+      <p style="font-size:14px; color:#777;">
+        Don’t miss out on our latest collection
+      </p>
+    </div>
+
+    <!-- Product Section -->
+    <div style="padding:0 20px;">
+      ${productHtml}
+    </div>
+
+    <!-- Message -->
+    <div style="padding:20px; font-size:14px; color:#444; line-height:1.6;">
+      ${String(message).replace(/\n/g, '<br/>')}
+    </div>
+
+    <!-- CTA Button -->
+    <div style="text-align:center; margin:20px;">
+      <a href="http://localhost:5173"
+         style="background:#D4A574; color:#1a1a1a; padding:12px 25px;
+                border-radius:6px; text-decoration:none; font-weight:bold;">
+        Shop Now
+      </a>
+    </div>
+
+    <!-- Optional Link -->
+    ${linkHtml ? `<div style="text-align:center; font-size:13px; margin-bottom:15px;">${linkHtml}</div>` : ''}
+
+    <!-- Footer -->
+    <div style="background:#1a1a1a; color:#aaa; text-align:center; padding:15px; font-size:12px;">
+      © 2026 Fashion Store • You are receiving this because you signed up
+      <br/>
+      <a href="#" style="color:#D4A574;">Unsubscribe</a>
+    </div>
+
+  </div>
+</div>
+
             `,
         });
 

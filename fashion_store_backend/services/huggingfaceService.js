@@ -1,5 +1,7 @@
 const { Client, handle_file } = require("@gradio/client");
 const axios = require('axios');
+const { cloudinary } = require('../config/cloudinary');
+const streamifier = require('streamifier');
 
 const TRYON_SUPPORTED_SUBCATEGORIES = [
     'shirts', 'shirt', 't-shirts', 't-shirt', 'tshirts', 'tshirt', 'pants', 'pant', 'tops', 'top', 'jeans', 'jean', 'dresses', 'dress',
@@ -35,6 +37,24 @@ const fetchImageAsBlob = async (url) => {
         console.error(`❌ Failed to fetch image from URL: ${url}`);
         throw err;
     }
+};
+
+
+const uploadBufferToCloudinary = (buffer, folder = 'tryon-results') => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            {
+                folder,
+                resource_type: 'image',
+            },
+            (error, result) => {
+                if (error) return reject(error);
+                resolve(result);
+            }
+        );
+
+        streamifier.createReadStream(buffer).pipe(stream);
+    });
 };
 
 /**
@@ -97,12 +117,24 @@ Close-up fashion photography style, sharp focus on the garment, clean background
         // result.data[0] is the result image object { url, orig_name, etc. }
         const outputImage = result.data[0];
 
-        if (outputImage && outputImage.url) {
-            return [{
-                url: outputImage.url,
-                pose: 'Professional Studio Fit'
-            }];
-        }
+       if (outputImage && outputImage.url) {
+    console.log("Downloading generated image from Hugging Face...");
+
+    const generatedImageResponse = await axios.get(outputImage.url, {
+        responseType: 'arraybuffer'
+    });
+
+    const generatedBuffer = Buffer.from(generatedImageResponse.data);
+
+    console.log("Uploading generated image to Cloudinary...");
+    const uploadedResult = await uploadBufferToCloudinary(generatedBuffer, 'tryon-results');
+
+    return [{
+        url: uploadedResult.secure_url,
+        pose: 'Professional Studio Fit',
+        publicId: uploadedResult.public_id
+    }];
+}
 
         // Handle errors in data (like the limit message user saw)
         const possibleError = result.data.find(d => typeof d === 'string' && (d.includes('limit') || d.includes('error')));

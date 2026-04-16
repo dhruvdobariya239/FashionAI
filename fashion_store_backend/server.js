@@ -15,7 +15,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const qrUploadRoutes = require('./routes/qrUploadRoutes');
 const adminPanelRoutes = require('./routes/adminPanelRoutes');
-
+const paymentRoutes = require('./routes/paymentRoutes');
 // Connect to DB
 connectDB();
 
@@ -40,8 +40,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/photo', qrUploadRoutes);
 app.use('/api/admin', adminPanelRoutes);
+app.use('/api/payment', paymentRoutes);
 
-// 404 handler
 app.use((req, res) => res.status(404).json({ message: `Route ${req.originalUrl} not found` }));
 
 // Error handler

@@ -83,59 +83,61 @@ const Checkout = () => {
     const shipping = subtotal > 999 ? 0 : 99;
     const total = subtotal + shipping;
 
-    const handlePlace = async (e) => {
-        e.preventDefault();
-        // Validate required fields
-        const missing = ADDRESS_FIELDS.filter(f => f.required && !address[f.id]?.trim());
-        if (missing.length) {
-            toast.error(`Please fill: ${missing.map(f => f.label).join(', ')}`);
-            return;
-        }
-        setPlacing(true);
-        try {
-            const shippingAddress = {
-                fullName: address.fullName,
-                phone: address.phone,
-                addressLine1: address.line1,
-                addressLine2: address.line2 || undefined,
-                city: address.city,
-                state: address.state,
-                postalCode: address.pincode,
-                country: 'India',
-            };
-            console.log('Sending order with address:', shippingAddress);
-            const { data } = await api.post('/orders', { shippingAddress, paymentMethod, notes });
-            console.log('Order response:', data);
-            
-            if (!data || !data._id) {
-                console.error('Invalid order response:', data);
-                toast.error('Order created but response is invalid');
-                return;
-            }
-            
+   const handlePlace = async (e) => {
+    e.preventDefault();
+
+    const missing = ADDRESS_FIELDS.filter(f => f.required && !address[f.id]?.trim());
+    if (missing.length) {
+        toast.error(`Please fill: ${missing.map(f => f.label).join(', ')}`);
+        return;
+    }
+
+    setPlacing(true);
+
+    try {
+        const shippingAddress = {
+            fullName: address.fullName,
+            phone: address.phone,
+            addressLine1: address.line1,
+            addressLine2: address.line2 || undefined,
+            city: address.city,
+            state: address.state,
+            postalCode: address.pincode,
+            country: 'India',
+        };
+
+        // ✅ COD (same as before)
+        if (paymentMethod === "cod") {
+            const { data } = await api.post('/orders', {
+                shippingAddress,
+                paymentMethod,
+                notes
+            });
+
             await fetchCart?.();
             setDone(data);
             toast.success('Order placed successfully! 🎉');
-        } catch (err) {
-            console.error('Order error:', err);
-            console.error('Error response data:', err.response?.data);
-            console.error('Error message:', err.message);
-            
-            const errorMsg = err.response?.data?.message || err.message || 'Could not place order';
-            
-            // Handle specific error cases
-            if (errorMsg.includes('deleted')) {
-                toast.error('Some items in your cart were deleted. Please refresh and try again.');
-            } else if (errorMsg.includes('null')) {
-                toast.error('Cart has invalid items. Please refresh your cart and try again.');
-            } else {
-                toast.error(errorMsg);
-            }
-        } finally {
-            setPlacing(false);
         }
-    };
 
+        // ✅ STRIPE PAYMENT
+        else {
+            const { data } = await api.post('/payment/create-checkout-session', {
+                items,
+                shippingAddress,
+                notes
+            });
+
+            // 🔥 Redirect to Stripe
+            window.location.href = data.url;
+        }
+
+    } catch (err) {
+        console.error(err);
+        toast.error(err.response?.data?.message || 'Something went wrong');
+    } finally {
+        setPlacing(false);
+    }
+};
     return (
         <div className="min-h-screen bg-gradient-to-b from-[#1a1a1a] to-[#0d0d0d] pt-20 pb-20">
             <div className="max-w-5xl mx-auto px-4 sm:px-8 py-10">
@@ -213,7 +215,7 @@ const Checkout = () => {
                                 </div>
                                 {paymentMethod === 'online' && (
                                     <p className="mt-3 text-xs text-[#D4D4D4] text-center">
-                                        Online payment integration coming soon — select COD for now.
+                                     Secure payment via UPI / Card / Wallet
                                     </p>
                                 )}
                             </div>

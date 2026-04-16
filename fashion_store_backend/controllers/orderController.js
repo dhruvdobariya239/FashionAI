@@ -5,7 +5,7 @@ const Cart = require('../models/Cart');
 // @route POST /api/orders
 const placeOrder = async (req, res, next) => {
     try {
-        const { shippingAddress, paymentMethod, notes } = req.body;
+        const { shippingAddress, paymentMethod, notes, paymentId } = req.body;
         console.log('Place order called - User:', req.user?._id);
         console.log('Request body:', { shippingAddress, paymentMethod, notes });
 
@@ -15,14 +15,14 @@ const placeOrder = async (req, res, next) => {
 
         const cart = await Cart.findOne({ user: req.user._id }).populate('items.product', 'name images price isActive');
         console.log('Cart found:', cart);
-        
+
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ message: 'Cart is empty' });
         }
 
         // Filter out items with null products (deleted products)
         const validItems = cart.items.filter(item => item.product !== null);
-        
+
         if (validItems.length === 0) {
             return res.status(400).json({ message: 'No valid items in cart (some products may have been deleted)' });
         }
@@ -49,7 +49,17 @@ const placeOrder = async (req, res, next) => {
             total: subtotal + shippingCost,
             notes,
         };
-        
+
+        if (paymentMethod === "online") {
+            if (!paymentId) {
+                return res.status(400).json({ message: "Payment ID missing" });
+            }
+            orderData.paymentStatus = "paid";
+            orderData.paymentId = paymentId;
+        } else {
+            orderData.paymentStatus = "pending";
+        }
+
         console.log('Creating order with:', orderData);
         const order = await Order.create(orderData);
         console.log('Order created:', order._id);
