@@ -10,6 +10,8 @@ A modern, full-stack fashion e-commerce application with AI-powered features inc
 
 ---
 
+<img width="1888" height="911" alt="v1" src="https://github.com/user-attachments/assets/2b7c3bee-33c6-4853-9bc5-37ded1b77ab9" />
+
 ## 📋 Table of Contents
 
 - [Project Overview](#project-overview)
@@ -340,7 +342,7 @@ PORT=5000
 NODE_ENV=development
 
 # Database
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/fashion_store?retryWrites=true&w=majority
+MONGODB_URI=your_monogodb_uri
 
 # JWT
 JWT_SECRET=your_super_secret_jwt_key_here
